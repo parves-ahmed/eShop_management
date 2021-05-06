@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <h5 class="card-header">Customer Info</h5>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                    <tr>
+                        <td>Customer Name</td>
+                        <td>{{ order.customer_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Phone</td>
+                        <td>{{ order.phone_number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ order.email }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><br>
+
+    <div class="container">
+        <table class="table table-bordered" id="item_table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Quantity</th>
+                 <th scope="col">Total Price</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ item.product.product_code }}</td>
+                    <td>{{ item.product.product_name }}</td>
+                    <td>{{ item.product.category }}</td>
+                    <td style="text-align: center">{{ item.product.unit_price }}</td>
+                    <td style="text-align: center">
+                        <input type="text" class="quantity" value="{{ item.quantity }}" style="width: 50px; text-align: center">
+                        <input type="hidden" class="item_quantity" value="{{ item.quantity }}">
+                        <input type="hidden" class="stock" value="{{ item.product.quantity }}">
+                    </td>
+                    <td style="text-align: center">
+                        <input type="hidden" class="item_id" value="{{ item.id }}">
+                        <input type="hidden" class="order_id" value="{{ item.order.id }}">
+                        <input type="number" class="total_price" value="{{ item.total_price }}"style="width: 100px; text-align: center" disabled>
+                    </td>
+                    <td style="text-align: center">
+                        <button class="btn btn-success update" update_url="{% url 'update_item' %}">Update</button>
+                        <a class="btn btn-danger delete" href="{% url 'delete_item' item.id %}" style="color: white">Remove</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: right">
+            <button class="btn btn-primary" href="{% url 'confirm_order' %}"
+               style="text-align: center; width: 100px; border-radius: 30px;" id="confirm">Confirm</button>
+        </div>
+
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+        $('.update').prop('disabled', true)
+        $('#item_table').on('keyup', '.quantity', function () {
+            setTotalPrice($(this))
+        })
+
+        $('#item_table').on('click', '.update', function () {
+            let url = $(this).attr('update_url')
+            let tr = $(this).closest('tr')
+            let item_id = tr.find('.item_id').val()
+            let order_id = tr.find('.order_id').val()
+            let quantity = tr.find('.quantity').val()
+            let total_price = tr.find('.total_price').val()
+            console.log('i: '+ item_id, 'o: '+ order_id, 'q: '+ quantity, 't: '+ total_price)
+            $.ajax({
+                url: url,
+                data: {
+                    item_id: item_id,
+                    order_id: order_id,
+                    quantity: quantity,
+                    total_price: total_price
+                },
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result['quantity'])
+                    let q = tr.find('.quantity').val(result['quantity'])
+                    let i = tr.find('.item_quantity').val(result['quantity'])
+                    let t = tr.find('.total_price').val(result['total_price'])
+                     console.log('item_quantity: ' + i.val(), 'q: '+ q.val(), 't: '+ t.val())
+                }
+            })
+        })
+
+        $('#confirm').click(function () {
+            let url = $(this).attr('href')
+            let arrData=[];
+            let row = $('#item_table tbody tr')
+            row.each(function () {
+                let currentRow=$(this);
+                let item_id = currentRow.find('.item_id').val();
+                let order_id = currentRow.find('.order_id').val();
+                let quantity = currentRow.find('.quantity').val();
+                let total_price = currentRow.find('.total_price').val();
+                console.log(item_id)
+                let obj={};
+                obj.item_id = item_id;
+                obj.order_id = order_id;
+                obj.quantity = quantity;
+                obj.total_price = total_price;
+                arrData.push(obj);
+            })
+            console.log(arrData);
+            $.ajax({
+                url: url,
+                data: {arrData: JSON.stringify(arrData)},
+                dataType: 'json',
+                type: 'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
+                success: function (result) {
+                    console.log(result)
+                }
+            })
+        })
+    });
+
+    function setTotalPrice(btn) {
+        let quantity = btn.val()
+        let stock = btn.closest('tr').find('.stock').val()
+        let item_quantity = btn.closest('tr').find('.item_quantity').val()
+        let update_btn = btn.closest('tr').find('.update')
+        let unit_price = btn.closest('tr').find('td:nth-child(5)').text()
+        let set_total_price = btn.closest('tr').find('.total_price')
+        if (quantity > parseInt(stock)){
+            alert('Sorry there is only ' + stock + ' of this product in stock')
+            update_btn.prop('disabled', true)
+        }
+        else {
+            quantity = quantity < 0 ? btn.val(item_quantity) ? quantity = item_quantity : btn.val() : quantity
+            if(quantity > 0 && quantity !== item_quantity){
+                update_btn.prop('disabled', false)
+            }
+        }
+        let total_price = (unit_price * quantity).toFixed(2)
+        set_total_price.val(total_price)
+    }
+</script>
+{% endblock extra_js %}

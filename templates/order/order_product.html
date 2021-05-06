@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <h5 class="card-header">Customer Info</h5>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tbody>
+                    <tr>
+                        <td>Customer Name</td>
+                        <td>{{ order.customer_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Phone</td>
+                        <td>{{ order.phone_number }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ order.email }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div><br>
+    <div class="container">
+        <div class="card">
+            <h5 class="card-header">
+                Add Item
+                <p class="float-right">Total Added <span class="badge badge-success" id="total_item">{{ total_item }}</span></p>
+            </h5>
+            <div class="card-body">
+                <form method="POST"  id="form">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col-md-5">
+                            <select class="form-control" id="product_id">
+                                <option value="">Default select</option>
+                                {% for product in products %}
+                                    <option value="{{ product.pk }}">{{ product.product_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" placeholder="product code" id="product_code">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-info search" url="{% url 'order_product' order.id %}" style="border-radius: 30px; width: 150px;">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <table class="table table-bordered" id="product_table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Quantity</th>
+                 <th scope="col">Total Price</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.category }}</td>
+                    <td style="text-align: center">{{ product.unit_price }}</td>
+                    <td style="text-align: center">
+                        <input type="text" class="quantity" value="1" style="width: 50px; text-align: center">
+                        <input type="hidden" class="stock" value="{{ product.quantity }}">
+                    </td>
+                    <td style="text-align: center">
+                        <input type="hidden" class="product_id" value="{{ product.id }}">
+                        <input type="hidden" class="order_id" value="{{ order.id }}">
+                        <input type="number" class="total_price" value="{{ product.unit_price }}"style="width: 100px; text-align: center" disabled>
+                    </td>
+                    <td>
+                        <button class="btn btn-success add" item_url="{% url 'add_item' %}">Add</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: right">
+            <a class="btn btn-primary" href="{% url 'order_details' order.id %}" style="text-align: center; width: 100px; border-radius: 30px">Done</a>
+        </div>
+
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function () {
+
+        $('.search').click(function () {
+            let product_id = $('#product_id option:selected').val()
+            let product_code = $('#product_code').val()
+            let url = $('form').attr('url')
+            let item_url = $('#product_table').find('.add').attr('item_url')
+            $.ajax({
+                url: url,
+                data: {product_id: product_id, 'product_code': product_code},
+                dataType: 'json',
+                success: function (result) {
+                    $('#product_table tbody tr').remove()
+                    let products = (result['products'])
+                    let tbody = $('#product_table tbody')
+                    console.log(result)
+                    if(products.length > 0){
+                        products = products[0]
+                        let order_id = result['order_id']
+                        addRow(products, order_id, item_url, tbody)
+                    }
+                    else {
+                        let row = '<tr>'+ '<td colspan="8" style="text-align: center">' + 'No Data Found' + '</td>' + '</tr>'
+                        tbody.append(row)
+                    }
+                }
+            })
+        })
+
+        $('#product_table').on('keyup', '.quantity', function () {
+            setTotalPrice($(this))
+        })
+        
+        $('#product_table').on('click', '.add', function () {
+            let order_id = $(this).closest('tr').find('.order_id').val()
+            let product_id = $(this).closest('tr').find('.product_id').val()
+            let quantity = $(this).closest('tr').find('.quantity').val()
+            let total_price = $(this).closest('tr').find('.total_price').val()
+            let url = $(this).attr('item_url')
+            let stock = $(this).closest('tr').find('.stock')
+            let total_item = $('#total_item')
+            if(quantity > stock.val()){
+                alert('This product is out of stock now')
+                return false
+            }
+            console.log('P: '+product_id, 'O: '+order_id, 'q: '+quantity, 't: ' +total_price, 'u: '+ url)
+            $.ajax({
+                url: url,
+                data: {
+                    order_id: order_id,
+                    product_id: product_id,
+                    quantity: quantity,
+                    total_price: total_price
+                },
+                dataType: 'json',
+                success: function(result){
+                    console.log(result['stock'])
+                    stock.val(result['stock'])
+                    total_item.text(result['total_item'])
+                    console.log(total_item.text())
+                }
+            })
+        })
+    });
+
+    function setTotalPrice(btn) {
+        let quantity = (btn.val() === '') ? 1 : btn.val()
+        let stock = btn.closest('tr').find('.stock').val()
+        let add_btn = btn.closest('tr').find('.add')
+        let unit_price = btn.closest('tr').find('td:nth-child(5)').text()
+        let set_total_price = btn.closest('tr').find('.total_price')
+        if (quantity > stock){
+            alert('Sorry there is only ' + stock + ' of this product in stock')
+            add_btn.prop('disabled', true)
+        }
+        else {
+            quantity = quantity < 0 ? btn.val(1) ? quantity = 1 : btn.val() : quantity
+            add_btn.prop('disabled', false)
+        }
+        let total_price = (unit_price * quantity).toFixed(2)
+        set_total_price.val(total_price)
+    }
+
+    function addRow(products, order_id, item_url, tbody){
+        let row = '<tr>' +
+                        '<td>' + 1 + '</td>' +
+                        '<td>' + products.product_code + '</td>' +
+                        '<td>' + products.product_name + '</td>' +
+                        '<td>' + products.category + '</td>' +
+                        '<td>' + products.unit_price + '</td>' +
+                        '<td>' +
+                                '<input type="text" class="quantity" value="1" style="width: 50px; text-align: center">' +
+                                '<input type="hidden" class="stock" value="' + products.quantity + '" >' +
+                        '</td>' +
+                        '<td>' +
+                                '<input type="hidden" class="product_id" value="' + products.id + '">' +
+                                '<input type="hidden" class="order_id" value="' + order_id + '">' +
+                                '<input type="number" class="total_price" value="' + products.unit_price + '" style="width: 100px; text-align: center" disabled>' +
+                        '</td>' +
+                        '<td>' +
+                        '<button class="btn btn-success add" item_url="' + item_url + '">Add</button>' +
+                        '</td>' +
+                 '</tr>'
+        tbody.append(row)
+    }
+</script>
+{% endblock extra_js %}

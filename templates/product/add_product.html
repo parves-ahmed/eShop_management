@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{#    <p>Add product</p>#}
+    <div class="container col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Featured
+            </div>
+            <div class="card-body">
+                <form action="{% url 'add_product' %}" id="form" method="POST">
+                    {% csrf_token %}
+                     {{ product_form|crispy }}
+                    <div class="form-row float-right">
+                        <a href="#" class="btn btn-primary" id="save">Save Product</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><br>
+{% endblock content %}
+
+{% block extra_js %}
+    <script>
+          $(document).ready(function () {
+              let form = $('#form')
+              let url = form.attr('action')
+              console.log(url)
+              $('#save').click(function () {
+                  let method = form.attr('method')
+                  let formData = form.serialize()
+                  $.ajax({
+                      url: url,
+                      data: formData,
+                      method: method,
+                      success: function (result) {
+                          form.trigger('reset')
+                          console.log(result)
+                      }
+                  })
+              })
+
+              let edit_btn = $('#edit')
+              edit_btn.click()
+          });
+    </script>
+{% endblock extra_js %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{#    <p>Add product</p>#}
+    <div class="container col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Featured
+            </div>
+            <div class="card-body">
+                <form id="form" method="POST">
+                    {% csrf_token %}
+                     {{ product_form|crispy }}
+                    <div class="form-row float-right">
+{#                        <a href="#" class="btn btn-primary" id="edit">Update</a>#}
+                        <button class="btn btn-success float-right" type="submit">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><br>
+{% endblock content %}
+
+{% block extra_js %}
+    <script>
+          $(document).ready(function () {
+
+          });
+    </script>
+{% endblock extra_js %}

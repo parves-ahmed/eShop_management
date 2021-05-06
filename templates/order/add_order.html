@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <p>Add product</p>
+    <div class="container col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Featured
+            </div>
+            <div class="card-body">
+                <form action="{% url 'add_order' %}" id="form" method="POST">
+                    {% csrf_token %}
+                     {{ order_form|crispy }}
+                    <div class="form-row float-right">
+                        <button type="submit" class="btn btn-primary" id="save">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><br>
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    {#$("#czContainer").czMore();#}
+    $(document).ready(function () {
+        {#let btn = $('#btnPlus').text('Add')#}
+        {#let recordList = $('.recordset')#}
+        {#btn.click(function () {#}
+        {#    let rmvBtn = $('.btnMinus').text('Remove')#}
+        {#})#}
+        {#console.log(btn)#}
+    });
+</script>
+{% endblock extra_js %}

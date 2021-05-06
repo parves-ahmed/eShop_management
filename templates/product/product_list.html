@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <table class="table table-bordered" id="product_table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.unit_price }}</td>
+                    <td>
+                        <a class="btn btn-warning edit" href="{% url 'product_update' product.id %}"><i class="fas fa-edit"></i></a>
+                        <button class="btn btn-danger delete" delete_url="{% url 'product_delete' product.id %}"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script>
+          $(document).ready(function () {
+              let table = $('#product_table')
+              table.each(function () {
+                  let delete_btn = $(this).find('.delete')
+                  delete_btn.click(function () {
+                      let product_name = $(this).closest('tr').find('td:nth-child(2)').text()
+                      let url = $(this).attr('delete_url')
+                      let confirm_delete = confirm('Are you sure to delete' + product_name)
+                      if(confirm_delete == true){
+                          $.ajax({
+                              url: url,
+                              dataType: 'json',
+                              type: 'DELETE',
+                              beforeSend: function (xhr) {
+                                  xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                              },
+                              success: function (result) {
+                                  console.log(result)
+                              }
+                          })
+                      }
+                  })
+              })
+          });
+    </script>
+{% endblock extra_js %}
