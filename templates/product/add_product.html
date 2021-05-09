@@ -2,9 +2,17 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-{#    <p>Add product</p>#}
     <div class="container col-md-6">
         <div class="card">
+            <!-- alert_box -->
+            {% if msg %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Sorry ! </strong> {{ msg }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
             <div class="card-header">
                 Featured
             </div>
@@ -13,7 +21,7 @@
                     {% csrf_token %}
                      {{ product_form|crispy }}
                     <div class="form-row float-right">
-                        <a href="#" class="btn btn-primary" id="save">Save Product</a>
+                        <button class="btn btn-primary" id="save" type="submit" >Save Product</button>
                     </div>
                 </form>
             </div>
@@ -23,26 +31,6 @@
 
 {% block extra_js %}
     <script>
-          $(document).ready(function () {
-              let form = $('#form')
-              let url = form.attr('action')
-              console.log(url)
-              $('#save').click(function () {
-                  let method = form.attr('method')
-                  let formData = form.serialize()
-                  $.ajax({
-                      url: url,
-                      data: formData,
-                      method: method,
-                      success: function (result) {
-                          form.trigger('reset')
-                          console.log(result)
-                      }
-                  })
-              })
 
-              let edit_btn = $('#edit')
-              edit_btn.click()
-          });
     </script>
 {% endblock extra_js %}

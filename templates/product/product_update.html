@@ -13,7 +13,6 @@
                     {% csrf_token %}
                      {{ product_form|crispy }}
                     <div class="form-row float-right">
-{#                        <a href="#" class="btn btn-primary" id="edit">Update</a>#}
                         <button class="btn btn-success float-right" type="submit">Update</button>
                     </div>
                 </form>
@@ -24,8 +23,6 @@
 
 {% block extra_js %}
     <script>
-          $(document).ready(function () {
 
-          });
     </script>
 {% endblock extra_js %}
