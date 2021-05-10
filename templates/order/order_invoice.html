@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <div class="row float-right">
+            <a class="btn btn-info" href="{% url 'download_invoice' order.id %}" style="margin-right: 15px">Download</a>
+        </div>
+        <div class="row">
+            <img src="{{ order.qr_code.url }}">
+        </div>
+        <div class="row">
+            <table class="table table-bordered" id="item_table">
+            <thead>
+            <tr style="text-align: center">
+                <th scope="col">#</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total Price</th>
+            </tr>
+            </thead>
+            <tbody  style=" text-align: center;">
+            {% for item in items %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ item.product.product_name }}</td>
+                    <td style="text-align: center">{{ item.product.unit_price }}</td>
+                    <td style="text-align: center">{{ item.quantity }}</td>
+                    <td style="text-align: right">{{ item.total_price }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+               <tr>
+                   <td colspan="4">Amount in words: {{ amount }} taka only</td>
+                   <td style="text-align: right">{{ order.grand_total_price }}</td>
+               </tr>
+            </tfoot>
+        </table>
+        </div>
+    </div>
+{% endblock content %}

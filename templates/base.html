@@ -8,18 +8,31 @@
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 </head>
 <body>
-{#<h1>index page: {{ context }}</h1>#}
-<a href="{% url 'add_product' %}">Add product</a>
-<a href="{% url 'add_order' %}">Add Order</a>
+<div class="container" style="margin-bottom: 30px;">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#"><img src="https://img.icons8.com/pastel-glyph/48/000000/fast-cart.png"/><i>SuperShop</i></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="{% url 'product_list' %}">Product <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" href="{% url 'order_list' %}">Order</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
 {% block content %}
 {% endblock content %}
 
-<footer style="background:#777; text-align: center; padding:5%; margin-top: 10px;">
+</body>
+<footer style="background:#ffffff; text-align: center; padding:5%; margin-top: 10px;">
     <p class="cp-text">
         © Copyright 2021 P@rves @hmed MooN. All rights reserved.
     </p>
 </footer>
-</body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>

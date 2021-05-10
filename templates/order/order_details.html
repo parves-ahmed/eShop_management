@@ -67,8 +67,9 @@
             </tbody>
         </table>
         <div style="text-align: right">
-            <button class="btn btn-primary" href="{% url 'confirm_order' %}"
+            <button class="btn btn-primary" href="{% url 'confirm_order' order.id %}"
                style="text-align: center; width: 100px; border-radius: 30px;" id="confirm">Confirm</button>
+            <a class="btn btn-primary" href="{% url 'order_invoice' order.id %}" id="invoice"></a>
         </div>
 
     </div>
@@ -77,6 +78,7 @@
 {% block extra_js %}
 <script>
     $(document).ready(function () {
+        $('#invoice').hide()
         $('.update').prop('disabled', true)
         $('#item_table').on('keyup', '.quantity', function () {
             setTotalPrice($(this))
@@ -99,6 +101,10 @@
                     total_price: total_price
                 },
                 dataType: 'json',
+                type:'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
                 success: function (result) {
                     console.log(result['quantity'])
                     let q = tr.find('.quantity').val(result['quantity'])
@@ -138,6 +144,13 @@
                 },
                 success: function (result) {
                     console.log(result)
+                    if(result['msg'] === 'Saved'){
+                        alert('saved')
+                        $('#invoice')[0].click()
+                    }
+                    if(result['msg'] === 'Exist'){
+                        alert('This Order Already Exist')
+                    }
                 }
             })
         })

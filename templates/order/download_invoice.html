@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <img src="{{ order.qr_code.path }}">
+        </div>
+        <div class="row">
+            <table class="table table-bordered" id="item_table">
+            <thead>
+            <tr style="border: 1px solid #000000; text-align: center; padding: 5px; font-size: 12px">
+                <th scope="col">#</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Unit Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr style="border: 1px solid #000000; text-align: center; padding: 5px; font-size: 12px">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td style="text-align: center">{{ item.product.product_name }}</td>
+                    <td style="text-align: center">{{ item.product.unit_price }}</td>
+                    <td style="text-align: center">{{ item.quantity }}</td>
+                    <td style="text-align: right">{{ item.total_price }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+               <tr style="border: 1px solid #000000; padding: 5px; font-size: 12px">
+                   <td colspan="4">Amount in words: {{ amount }} taka only</td>
+                   <td style="text-align: right">{{ order.grand_total_price }}</td>
+               </tr>
+            </tfoot>
+        </table>
+        </div>
+    </div>
+</body>
+<footer style="background:#ffffff; text-align: center; padding:5%; margin-top: 10px;">
+    <p class="cp-text">
+        © Copyright 2021 P@rves @hmed MooN. All rights reserved.
+    </p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</html>

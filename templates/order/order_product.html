@@ -113,6 +113,7 @@
                 url: url,
                 data: {product_id: product_id, 'product_code': product_code},
                 dataType: 'json',
+                type: 'GET',
                 success: function (result) {
                     $('#product_table tbody tr').remove()
                     let products = (result['products'])
@@ -157,6 +158,10 @@
                     total_price: total_price
                 },
                 dataType: 'json',
+                type: 'POST',
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                },
                 success: function(result){
                     console.log(result['stock'])
                     stock.val(result['stock'])
