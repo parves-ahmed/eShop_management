@@ -24,6 +24,7 @@ class Orders(models.Model):
     def __str__(self):
         return self.order_number
 
+    # save qr_code in confirm_order stage, as the confirm is true on that stage
     def save(self, *args, **kwargs):
         if self.confirm is True:
             input_data = 'Name: ' + self.customer_name + '\nPhone: ' + self.phone_number + '\nEmail: ' + self.email
