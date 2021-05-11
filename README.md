@@ -36,3 +36,7 @@ if the product is out of stock.
 > python manage.py runserver
 6. Result generates in:
 > http://127.0.0.1:8000
+
+## User Manual
+You can catch the app live on: https://estore20.herokuapp.com/
+
