@@ -163,10 +163,13 @@
                     xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
                 },
                 success: function(result){
-                    console.log(result['stock'])
-                    stock.val(result['stock'])
-                    total_item.text(result['total_item'])
-                    console.log(total_item.text())
+                     if((result['stock'] !== '' && result['total_item'] !== '')){
+                         stock.val(result['stock'])
+                         total_item.text(result['total_item'])
+                    }
+                    if(result['msg'] === 'Stock out'){
+                        alert("Stock out")
+                    }
                 }
             })
         })

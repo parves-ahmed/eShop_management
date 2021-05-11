@@ -36,7 +36,7 @@
                 <th scope="col">Category</th>
                 <th scope="col">Unit Price</th>
                 <th scope="col">Quantity</th>
-                 <th scope="col">Total Price</th>
+                <th scope="col">Total Price</th>
                 <th scope="col">Action</th>
             </tr>
             </thead>
@@ -66,12 +66,21 @@
             {% endfor %}
             </tbody>
         </table>
-        <div style="text-align: right">
-            <button class="btn btn-primary" href="{% url 'confirm_order' order.id %}"
-               style="text-align: center; width: 100px; border-radius: 30px;" id="confirm">Confirm</button>
-            <a class="btn btn-primary" href="{% url 'order_invoice' order.id %}" id="invoice"></a>
-        </div>
-
+        {% if not items %}
+            <div style="text-align: center">
+                <p>It seems no Item added</p>
+                <a class="btn btn-primary" href="{% url 'order_product' order.id %}"
+                        style="width: 100px; border-radius: 30px;" id="confirm">ADD ITEM
+                </a>
+            </div>
+        {% else %}
+            <div style="text-align: right">
+                <button class="btn btn-primary" href="{% url 'confirm_order' order.id %}"
+                        style="width: 100px; border-radius: 30px;" id="confirm">Confirm
+                </button>
+                <a class="btn btn-primary" href="{% url 'order_invoice' order.id %}" id="invoice"></a>
+            </div>
+        {% endif %}
     </div>
 {% endblock content %}
 
