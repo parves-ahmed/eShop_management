@@ -102,6 +102,7 @@ def confirm_order(request, order_id):
                 print(product.quantity)
                 product.save()
             # set order.confirm & grand_total
+            order.order_number = '{}{}'.format('order_', order.id)
             order.confirm = True
             order.grand_total_price = grand_total
             print(order.confirm, order.grand_total_price)
