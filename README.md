@@ -40,3 +40,8 @@ if the product is out of stock.
 ## User Manual
 You can catch the app live on: https://estore20.herokuapp.com/
 
+### Product Secion
+
+> Add Product
+
+![alt text](media/qr_codes/qr_code-Moon.png)
