@@ -104,6 +104,6 @@ If all is ok then click 'Confirm'.
 
 Now, you can see the invoice with QR code. If you scan the QR code, you can see customer info for this order you added.
 
-![alt text](user_manual/user_manual/invoice.PNG)
+![alt text](user_manual/invoice.PNG)
 
 You can download the pdf. To download it, click on 'Download' button on right-top corner.
